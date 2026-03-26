@@ -31,3 +31,30 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Maven
+target/
+*.class
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# AWS
+.aws/
+*.csv
+application-secrets.properties
+
+# Variáveis de ambiente
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
