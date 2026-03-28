@@ -44,6 +44,16 @@
 
 	<dependencies>
 
+		<!-- Flyway - Database migrations -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+
 		<!-- AWS S3 -->
 		<dependency>
 			<groupId>io.awspring.cloud</groupId>
