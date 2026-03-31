@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,9 +30,15 @@ public class OrderService {
         Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + dto.getCustomerId()));
 
+        LocalDateTime now = LocalDateTime.now();
+
         Order order = Order.builder()
                 .customer(customer)
+                .status(OrderStatus.PENDING)
                 .notes(dto.getNotes())
+                .totalAmount(BigDecimal.ZERO)
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
 
         List<OrderItem> items = dto.getItems().stream()
@@ -40,6 +47,7 @@ public class OrderService {
                         .productName(itemDto.getProductName())
                         .quantity(itemDto.getQuantity())
                         .unitPrice(itemDto.getUnitPrice())
+                        .createdAt(now)
                         .build())
                 .toList();
 
