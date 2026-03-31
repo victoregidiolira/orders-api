@@ -7,6 +7,7 @@ import com.vito.orders_api.domain.OrderStatus;
 import com.vito.orders_api.dto.OrderItemResponseDTO;
 import com.vito.orders_api.dto.OrderRequestDTO;
 import com.vito.orders_api.dto.OrderResponseDTO;
+import com.vito.orders_api.exception.ResourceNotFoundException;
 import com.vito.orders_api.repository.CustomerRepository;
 import com.vito.orders_api.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class OrderService {
     @Transactional
     public OrderResponseDTO create(OrderRequestDTO dto) {
         Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + dto.getCustomerId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found: " + dto.getCustomerId()));
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -74,7 +75,7 @@ public class OrderService {
     public OrderResponseDTO findById(UUID id) {
         return orderRepository.findById(id)
                 .map(this::toResponse)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +89,7 @@ public class OrderService {
     @Transactional
     public OrderResponseDTO updateStatus(UUID id, OrderStatus newStatus) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
 
         order.setStatus(newStatus);
         return toResponse(orderRepository.save(order));
@@ -97,7 +98,7 @@ public class OrderService {
     @Transactional
     public void delete(UUID id) {
         if (!orderRepository.existsById(id)) {
-            throw new IllegalArgumentException("Order not found: " + id);
+            throw new ResourceNotFoundException("Order not found: " + id);
         }
         orderRepository.deleteById(id);
     }
