@@ -4,6 +4,7 @@ import com.vito.orders_api.domain.Customer;
 import com.vito.orders_api.domain.Order;
 import com.vito.orders_api.domain.OrderItem;
 import com.vito.orders_api.domain.OrderStatus;
+import com.vito.orders_api.dto.OrderEventDTO;
 import com.vito.orders_api.dto.OrderItemResponseDTO;
 import com.vito.orders_api.dto.OrderRequestDTO;
 import com.vito.orders_api.dto.OrderResponseDTO;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private final OrderEventProducer eventProducer;
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
 
@@ -61,7 +63,19 @@ public class OrderService {
 
         order.setTotalAmount(total);
 
-        return toResponse(orderRepository.save(order));
+        OrderResponseDTO response = toResponse(orderRepository.save(order));
+
+        eventProducer.sendOrderEvent(OrderEventDTO.builder()
+                .orderId(response.getId())
+                .customerId(response.getCustomerId())
+                .customerName(response.getCustomerName())
+                .customerEmail(customer.getEmail())
+                .status(response.getStatus())
+                .totalAmount(response.getTotalAmount())
+                .eventType("ORDER_CREATED")
+                .build());
+
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -92,8 +106,22 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
 
-        order.setStatus(newStatus);
-        return toResponse(orderRepository.save(order));
+        order.setStatus(newStatus);  // ← move para ANTES do save
+
+        Order saved = orderRepository.save(order);
+        OrderResponseDTO response = toResponse(saved);
+
+        eventProducer.sendOrderEvent(OrderEventDTO.builder()
+                .orderId(response.getId())
+                .customerId(response.getCustomerId())
+                .customerName(response.getCustomerName())
+                .customerEmail(saved.getCustomer().getEmail())
+                .status(response.getStatus())
+                .totalAmount(response.getTotalAmount())
+                .eventType("ORDER_STATUS_UPDATED")
+                .build());
+
+        return response;
     }
 
     @Transactional

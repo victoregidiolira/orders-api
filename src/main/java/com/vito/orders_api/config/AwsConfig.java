@@ -7,6 +7,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 @Configuration
 public class AwsConfig {
@@ -34,4 +36,21 @@ public class AwsConfig {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
     }
+
+    @Bean
+    public SqsClient sqsClient() {
+        return SqsClient.builder()
+                .region(Region.US_EAST_1)
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+    }
+
+    @Bean
+    public SnsClient snsClient() {
+        return SnsClient.builder()
+                .region(Region.US_EAST_1)
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+    }
+
 }
