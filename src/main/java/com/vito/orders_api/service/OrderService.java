@@ -13,6 +13,7 @@ import com.vito.orders_api.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -103,6 +104,35 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
+    private final S3Service s3Service;
+
+    @Transactional
+    public OrderResponseDTO uploadAttachment(UUID id, MultipartFile file) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
+
+        if (order.getAttachmentUrl() != null) {
+            s3Service.deleteFile(order.getAttachmentUrl());
+        }
+
+        String key = s3Service.uploadFile(file, "orders/" + id);
+        order.setAttachmentUrl(key);
+
+        return toResponse(orderRepository.save(order));
+    }
+
+    @Transactional(readOnly = true)
+    public String getAttachmentPresignedUrl(UUID id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + id));
+
+        if (order.getAttachmentUrl() == null) {
+            throw new ResourceNotFoundException("Order has no attachment: " + id);
+        }
+
+        return s3Service.generatePresignedUrl(order.getAttachmentUrl());
+    }
+
     private OrderResponseDTO toResponse(Order order) {
         List<OrderItemResponseDTO> itemDtos = order.getItems().stream()
                 .map(item -> OrderItemResponseDTO.builder()
@@ -124,6 +154,7 @@ public class OrderService {
                 .items(itemDtos)
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
+                .attachmentUrl(order.getAttachmentUrl())
                 .build();
     }
 }

@@ -4,11 +4,14 @@ import com.vito.orders_api.domain.OrderStatus;
 import com.vito.orders_api.dto.OrderRequestDTO;
 import com.vito.orders_api.dto.OrderResponseDTO;
 import com.vito.orders_api.service.OrderService;
+import com.vito.orders_api.service.S3Service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,4 +54,18 @@ public class OrderController {
         orderService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    private final S3Service s3Service;
+
+    @PostMapping(value = "/{id}/attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<OrderResponseDTO> uploadAttachment(@PathVariable UUID id,
+                                                             @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(orderService.uploadAttachment(id, file));
+    }
+
+    @GetMapping("/{id}/attachment/url")
+    public ResponseEntity<String> getAttachmentUrl(@PathVariable UUID id) {
+        return ResponseEntity.ok(orderService.getAttachmentPresignedUrl(id));
+    }
+
 }

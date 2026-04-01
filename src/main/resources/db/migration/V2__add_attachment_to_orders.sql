@@ -1,0 +1,1 @@
+ALTER TABLE orders ADD COLUMN attachment_url VARCHAR(500);
