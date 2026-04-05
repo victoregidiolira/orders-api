@@ -18,19 +18,16 @@ Desenvolvido do zero como projeto de portfólio para demonstrar habilidades em *
 ---
 
 ## 🏗️ Arquitetura
-
-```
 Cliente
-   │
-   ▼
+│
+▼
 Spring Boot (EC2)
-   ├── Cognito ──────── Autenticação JWT
-   ├── RDS PostgreSQL ── Persistência de dados
-   ├── S3 ───────────── Upload de arquivos
-   ├── SQS ──────────── Fila de eventos
-   │     └── SNS ────── Notificações por email
-   └── CloudWatch ───── Logs e monitoramento
-```
+├── Cognito ──────── Autenticação JWT
+├── RDS PostgreSQL ── Persistência de dados
+├── S3 ───────────── Upload de arquivos
+├── SQS ──────────── Fila de eventos
+│     └── SNS ────── Notificações por email
+└── CloudWatch ───── Logs e monitoramento
 
 ---
 
@@ -48,6 +45,7 @@ Spring Boot (EC2)
 | Servidor | AWS EC2 |
 | Monitoramento | AWS CloudWatch |
 | CI/CD | GitHub Actions |
+| Documentação | Swagger / OpenAPI 3.1 |
 | Build | Maven |
 
 ---
@@ -80,7 +78,6 @@ Spring Boot (EC2)
 ## 🔐 Autenticação
 
 Todos os endpoints (exceto `/auth/**`) exigem token JWT no header:
-
 ```http
 Authorization: Bearer <access_token>
 ```
@@ -89,21 +86,33 @@ O token é obtido via `POST /api/v1/auth/login` e validado automaticamente pelo 
 
 ---
 
+## 📖 Documentação
+
+A API possui documentação interativa gerada automaticamente com Swagger/OpenAPI.
+
+Com a aplicação rodando, acesse:
+http://localhost:8080/swagger-ui.html
+
+Para autenticar no Swagger:
+1. Faça login via `POST /api/v1/auth/login` e copie o `accessToken`
+2. Clique no botão **Authorize** 🔒 no topo da página
+3. Cole o token no campo **bearerAuth** e clique em **Authorize**
+4. Todos os endpoints estarão liberados para teste
+
+---
+
 ## 📨 Fluxo de mensageria
 
 Ao criar ou atualizar um pedido, a API publica um evento no SQS. Um consumer interno processa a mensagem e publica uma notificação no SNS, que entrega um email ao cliente automaticamente.
-
-```
 Pedido criado/atualizado
-        ↓
-   SQS (orders-events)
-        ↓
-   Consumer processa
-        ↓
-   SNS publica notificação
-        ↓
-   Email entregue ao cliente 📧
-```
+↓
+SQS (orders-events)
+↓
+Consumer processa
+↓
+SNS publica notificação
+↓
+Email entregue ao cliente 📧
 
 ---
 
@@ -118,7 +127,6 @@ Pedido criado/atualizado
 ### Variáveis de ambiente
 
 Configure as seguintes variáveis antes de rodar:
-
 ```bash
 DB_HOST=seu-host-rds
 DB_NAME=ordersdb
@@ -132,7 +140,6 @@ S3_BUCKET_NAME=seu-bucket
 ```
 
 ### Rodando
-
 ```bash
 mvn spring-boot:run
 ```
@@ -159,10 +166,38 @@ O pipeline de deploy é automático via **GitHub Actions**:
 - **Alarme** configurado para alertar quando CPU ultrapassar 80%
 
 ---
+# 🛒 Orders API
 
+> API REST de gerenciamento de pedidos integrada com os principais serviços da AWS — construída como projeto de portfólio backend.
+
+![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.4-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL_16-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+
+---
+
+## 📌 Sobre o projeto
+
+API de e-commerce simplificado para gerenciamento de clientes e pedidos, com autenticação JWT, upload de arquivos, mensageria assíncrona e notificações por email — tudo integrado com serviços reais da AWS.
+
+Desenvolvido do zero como projeto de portfólio para demonstrar habilidades em **Java backend** e **cloud AWS**.
+
+---
+
+## 🏗️ Arquitetura
+
+Cliente
+│
+▼
+Spring Boot (EC2)
+├── Cognito ──────── Autenticação JWT
+├── RDS PostgreSQL ── Persistência de dados
+├── S3 ───────────── Upload de arquivos
+├── SQS ──────────── Fila de eventos
+│     └── SNS ────── Notificações por email
+└── CloudWatch ───── Logs e monitoramento
 ## 🗂️ Estrutura do projeto
-
-```
 src/main/java/com/vito/orders_api/
 ├── controller/      # Endpoints REST
 ├── service/         # Regras de negócio
@@ -171,11 +206,9 @@ src/main/java/com/vito/orders_api/
 ├── dto/             # Objetos de transferência
 ├── config/          # Configurações (AWS, Security)
 └── exception/       # Tratamento de erros global
-
 src/main/resources/
 ├── application.properties
 └── db/migration/    # Scripts Flyway
-```
 
 ---
 
