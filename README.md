@@ -26,11 +26,17 @@ Cliente
 │
 ▼
 Spring Boot (EC2)
+
 ├── Cognito ──────── Autenticação JWT
+
 ├── RDS PostgreSQL ── Persistência de dados
+
 ├── S3 ───────────── Upload de arquivos
+
 ├── SQS ──────────── Fila de eventos
-│     └── SNS ────── Notificações por email
+
+│⠀ ⠀ ⠀ └── SNS ────── Notificações por email
+
 └── CloudWatch ───── Logs e monitoramento
 
 
