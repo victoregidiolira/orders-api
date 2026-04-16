@@ -1,6 +1,3 @@
-O README ficou duplicado — parece que colou duas vezes. Aqui está a versão final e limpa com o link do EC2:
-markdown
-
 # 🛒 Orders API
 
 > API REST de gerenciamento de pedidos integrada com os principais serviços da AWS — construída como projeto de portfólio backend.
